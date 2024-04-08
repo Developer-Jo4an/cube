@@ -27,21 +27,25 @@ const Home = () => {
             const geometry = new Three.BoxGeometry(1, 1, 1)
             const material = new Three.ShaderMaterial({
                 uniforms: {
-                    time: { value: 1 },
+                    time: { value: 0.0 },
                     resolution: { value: new Three.Vector2() }
                 },
                 vertexShader: `
-                    varying vec2 vUv;
+                    varying vec3 vUv; 
+                
                     void main() {
-                        vUv = uv;
-                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                      vUv = position; 
+                
+                      vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
+                      gl_Position = projectionMatrix * modelViewPosition; 
                     }
                 `,
                 fragmentShader: `
                     uniform float time;
-                    varying vec2 vUv;
+                    varying vec3 vUv;
+                
                     void main() {
-                        gl_FragColor = vec4(vUv, sin(time), 1.0);
+                        gl_FragColor = vec4(vUv + cos(time) * 0.5 + 0.5, 1.0); 
                     }
                 `
             })
@@ -55,11 +59,24 @@ const Home = () => {
             renderer.setSize(width, height)
             containerRef.current.append(renderer.domElement)
 
-            const generalAnimation = () => {
+            const generalAnimation = time => {
+                time *= 0.001
+
+                material.uniforms.time.value = time
+
                 renderer.render(scene, camera)
                 animationFrameId = requestAnimationFrame(generalAnimation)
-            }
-            generalAnimation()
+            }; generalAnimation()
+
+            window.addEventListener('resize', () => {
+                const width = +containerRef.current.offsetWidth
+                const height = +containerRef.current.offsetHeight
+
+                camera.aspect = width / height
+                camera.updateProjectionMatrix()
+
+                renderer.setSize(width, height)
+            })
         })()
 
         return () => {
@@ -75,7 +92,9 @@ const Home = () => {
     }, [])
 
     return (
-        <div className={ 'cube' } ref={ containerRef }></div>
+        <div className={ 'cube' } ref={ containerRef }>
+
+        </div>
     )
 }
 
