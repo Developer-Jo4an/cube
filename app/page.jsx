@@ -1,5 +1,12 @@
 'use client'
 import { useEffect, useRef } from 'react'
+import { SceneInit } from '@/lighting/SceneInit'
+import { CREATE_CUBE } from '@/lighting/constants'
+
+const addCube = () => {
+    const customEvent = new CustomEvent(CREATE_CUBE)
+    window.dispatchEvent(customEvent)
+}
 
 const Home = () => {
     const containerRef = useRef()
@@ -8,18 +15,29 @@ const Home = () => {
         let controller = null
 
         ;(async () => {
-		    window.THREE = await import('three')
-            const { CubeController } = await import('@/cube/CubeController')
+            window.THREE = await import('three')
+            window.OrbitControls = (await import('three/addons')).OrbitControls
 
-		    controller = new CubeController(containerRef.current)
-		    controller.activate()
+            const { SceneInit } = await import('@/lighting/SceneInit')
+            controller = new SceneInit(containerRef.current)
+            controller.activate()
         })()
 
-        return () => controller.deactivate()
+        return () => {
+            if (controller) {
+                controller.deactivate()
+            }
+        }
     }, [])
 
     return (
-        <div className={ 'cube' } ref={ containerRef }></div>
+        <div className={ 'cube' } ref={ containerRef }>
+            <button
+                className={ 'cube__button' }
+                onClick={ addCube }
+            >Add CUBE
+            </button>
+        </div>
     )
 }
 
