@@ -8,7 +8,7 @@ export class CubeController {
 		this.turnCube = this.turnCube.bind(this)
 		this.listenMouseCoordinates = this.listenMouseCoordinates.bind(this)
 
-		this.container = container
+		this.$container = container
 		this.renderer = null
 		this.scene = null
 		this.camera = null
@@ -27,13 +27,13 @@ export class CubeController {
 
 	createRenderer() {
 		this.renderer = new window.THREE.WebGLRenderer()
-		this.container.append(this.renderer.domElement)
+		this.$container.append(this.renderer.domElement)
 	}
 
 	createCamera() {
 		this.camera = new window.THREE.PerspectiveCamera(
 			75,
-			this.container.offsetWidth / this.container.height,
+			this.$container.offsetWidth / this.$container.height,
 			0.1,
 			2000
 		)
